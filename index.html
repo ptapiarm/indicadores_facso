@@ -867,6 +867,7 @@ function renderPregrado(zone, pg){
 
     <div class="section-title"><span class="n">01</span><h3>Matrícula Total</h3><div class="line"></div></div>
     <div class="card tall" style="margin-bottom:18px;"><h4>Evolución de matrícula vigente${scopeSuffix}</h4><div class="note">Total vigentes al 30 de abril de cada año${(!selected && carreras.length>1) ? ', por carrera' : ''}</div><canvas id="chartVigentes"></canvas></div>
+    <div class="card tall" style="margin-bottom:18px;"><h4>Evolución de matrícula vigente — Total Facultad</h4><div class="note">Suma de todas las carreras, total vigentes al 30 de abril de cada año</div><canvas id="chartVigentesTotal"></canvas></div>
     <div class="card tall" style="margin-bottom:18px;">${hasGratuidad ? '<h4>% Estudiantes con gratuidad'+scopeSuffix+'</h4><div class="note">Por cohorte, información DAE</div><canvas id="chartGratuidad"></canvas>' : '<h4>% Estudiantes con gratuidad</h4>'+emptyMini('Sin datos disponibles')}</div>
 
     <div class="section-title"><span class="n">02</span><h3>Ocupación de vacantes — 1er semestre</h3><div class="line"></div></div>
@@ -923,6 +924,7 @@ function renderPregrado(zone, pg){
   if(hasMultiple) wireCarreraSelector();
 
   buildVigentesChart(carreras, selected);
+  buildVigentesTotalChart(pg.total_facultad);
   buildOcupacionChart(dataSource);
   buildVacNuevosCompChart(dataSource);
   if(hasAltPeriods){ buildPeriodosChart(periodosCarreras); buildPeriodosTable(periodosCarreras); }
@@ -978,6 +980,19 @@ function buildVigentesChart(carreras, selected){
     tension:0.35, spanGaps:true, pointRadius:2.5, borderWidth:2,
   }));
   charts.vigentes = new Chart(ctx, { type:'line', data:{ labels:YEARS, datasets }, options: commonLineOpts({xTitle:'Año Académico', yTitle:'Matriculados'}) });
+}
+function buildVigentesTotalChart(totalFacultad){
+  const ctx = document.getElementById('chartVigentesTotal');
+  charts.vigentesTotal = new Chart(ctx, {
+    type:'line',
+    data:{ labels: YEARS, datasets:[{
+      label: 'Total Facultad',
+      data: seriesFor(totalFacultad.vigentes, YEARS),
+      borderColor: accentColor(currentFac), backgroundColor: accentColor(currentFac)+'33',
+      fill:true, tension:0.35, spanGaps:true, pointRadius:3, borderWidth:2.5,
+    }] },
+    options: commonLineOpts({xTitle:'Año Académico', yTitle:'Matriculados'})
+  });
 }
 function buildOcupacionChart(totals){
   const ctx = document.getElementById('chartOcupacion');
